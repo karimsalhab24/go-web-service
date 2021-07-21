@@ -37,6 +37,8 @@ func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}
 
+		w.Write([]byte(matches[0]))
+		w.Write([]byte(matches[1]))
 		//convert String response to a numerical data
 		id, err := strconv.Atoi(matches[1])
 		if err != nil {
@@ -57,7 +59,6 @@ func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	w.Write([]byte("Hello from the User Controller"))
 }
 
 func (uc *userController) getAll(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +87,7 @@ func (uc *userController) post(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Could not parse user object"))
 		return
 	}
+	encoreResponseAsJSON(u, w)
 }
 
 func (uc *userController) put(id int, w http.ResponseWriter, r *http.Request) {
@@ -98,6 +100,12 @@ func (uc *userController) put(id int, w http.ResponseWriter, r *http.Request) {
 	if id != u.ID {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("ID of submitted user must match ID in URL"))
+		return
+	}
+	u, err = models.UpdateUser(u)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 	encoreResponseAsJSON(u, w)
@@ -129,6 +137,6 @@ func newUserController() *userController {
 	// we can use the address of (&) on a struct instead of a var name
 	// but we cannot do for example: &42 (literal variable)
 	return &userController{
-		userIDPattern: regexp.MustCompile(`^/users/(d+)/?`),
+		userIDPattern: regexp.MustCompile(`^/users/(\d+)/?`),
 	}
 }

@@ -50,8 +50,8 @@ func GetUserByID(id int) (User, error) {
 }
 
 func UpdateUser(u User) (User, error) {
-	for i, c := range users {
-		if c.ID == u.ID {
+	for i, candidate := range users {
+		if candidate.ID == u.ID {
 			users[i] = &u
 			return u, nil
 		}
@@ -60,8 +60,8 @@ func UpdateUser(u User) (User, error) {
 }
 
 func RemoveUserById(id int) error {
-	for i, c := range users {
-		if c.ID == id {
+	for i, u := range users {
+		if u.ID == id {
 			users = append(users[:i], users[i+1:]...)
 			return nil
 		}
